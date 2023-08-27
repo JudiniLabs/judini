@@ -1,82 +1,68 @@
-import https from 'https'
-
 const JUDINI_TUTORIAL = 'https://docs.codegpt.co/docs/tutorial-ai-providers/judini'
 
 export class CodeGPTPlus {
-    constructor(apiKey) {
-        this.apiKey = apiKey
-        this.isStreaming = false
-    }
+  constructor (apiKey) {
+    this.apiKey = apiKey
+    this.isStreaming = false
+  }
 
-    isLoading() {
-        return this.isStreaming
-    }
+  isLoading () {
+    return this.isStreaming
+  }
 
-    stopStreaming() {
-        this.isStreaming = false
-    }
+  stopStreaming () {
+    this.isStreaming = false
+  }
 
-    async chatCompletion({ messages, agentId = ''}, callback = () => {}) {
-        this.isStreaming = true
+  async chatCompletion ({ messages, agentId = '' }, callback = () => {
+  }) {
+    this.isStreaming = true
 
-        const options = {
-            hostname: 'plus.codegpt.co',
-            port: 443,
-            path: agentId ? `/api/v1/agent/${agentId}` : '/api/v1/agent',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + this.apiKey
-            }
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      let fullResponse = ''
+
+      const body = {
+        messages
+      }
+
+      const response = await fetch(agentId ? `https://plus.codegpt.co/api/v1/agent/${agentId}` : 'https://plus.codegpt.co/api/v1/agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.apiKey
+        },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) {
+        const errorMessage = `JUDINI: API Response was: ${response.status} ${response.statusText} ${JUDINI_TUTORIAL}`
+        throw new Error(errorMessage)
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder('utf-8')
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          break
         }
-
-        const body = {
-            messages
+        const text = decoder.decode(value)
+        if (text.includes('data: [DONE]')) {
+          this.isStreaming = false
+          resolve(fullResponse)
+          break
         }
-
-        // Creamos una nueva Promise que se resolverá cuando la solicitud se complete
-        return new Promise((resolve, reject) => {
-            let fullResponse = ''
-
-            const request = https.request(options, response => {
-                response.on('data', async (chunk) => {
-                    if (!this.isStreaming) {
-                        request.abort()
-                        resolve(fullResponse)
-                        return
-                    }
-                    const decoder = new TextDecoder('utf-8')
-                    const text = decoder.decode(chunk)
-                    if (text.includes('data: [DONE]')) {
-                        return
-                    }
-                    try {
-                        const datas = text.split('\n\n')
-                        for (let i = 0; i < datas.length; i++) {
-                            const data = JSON.parse(datas[i].replace('data: ', ''))
-                            fullResponse+=data.data
-                            callback(data.data)
-                        }
-                    } catch (e) { }
-                })
-
-                response.on('error', (e) => {
-                    if (this.isStreaming) {
-                        const errorMessage = `JUDINI: API Response was: Error ${e.message} ${JUDINI_TUTORIAL}`
-                        callback(errorMessage)
-                        fullResponse+=errorMessage
-                        resolve(fullResponse)
-                    }
-                })
-
-                response.on('close', () => {
-                    this.isStreaming = false
-                    resolve(fullResponse)
-                })
-            })
-
-            request.write(JSON.stringify(body))
-            request.end()
-        })
-    }
+        try {
+          const datas = text.split('\n\n')
+          for (let i = 0; i < datas.length; i++) {
+            const data = JSON.parse(datas[i].replace('data: ', ''))
+            callback(data.data)
+            fullResponse += data.data
+          }
+        } catch {}
+      }
+    })
+  }
 }

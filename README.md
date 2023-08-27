@@ -16,24 +16,25 @@ Here's an example of how to use Judini to interact with the CodeGPTPlus API:
 ```js
 import { CodeGPTPlus } from 'judini'
 
-async function main() {
+async function main () {
     // Replace with your own API Key
     const codegpt = new CodeGPTPlus('YOUR_API_KEY')
 
     // Define the message
-    const msg = [{role: 'user', content: 'What is the capital of Australia?'}]
+    const msg = [{ role: 'user', content: 'What is the capital of Australia?' }]
 
     // Send the message and process the response
     const res = await codegpt.chatCompletion({
         messages: msg,
         agentId: 'YOUR_AGENT_ID'
-    }, (data) => {
-        console.log(data)
+    }, (chunk) => {
+        console.log(chunk) // show the streaming response
     })
-    console.log({res})
+    console.log({ res }) // show the final response
 }
 
 main()
+
 ```
 
 
