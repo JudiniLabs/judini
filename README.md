@@ -48,7 +48,7 @@ const response = await judini.chatCompletion({ messages, agentId } , callback);
 
 ## Parameters
 
-- **messagse**: An array of message objects that you want to send to the CodeGPTPlus API. Each object should have a `role` (which can be 'system', 'user', or 'assistant') and `content` which is the actual message.
+- **messages**: An array of message objects that you want to send to the CodeGPTPlus API. Each object should have a `role` (which can be 'system', 'user', or 'assistant') and `content` which is the actual message.
 
 - **agentId** (Optional): This optional parameter specifies the ID of the agent you want to use for the conversation. If no agentId is provided, the default agent is used.
 
