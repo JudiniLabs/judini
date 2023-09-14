@@ -72,8 +72,28 @@ Please note that the `agentId` and `callback` parameters are optional.
 
 The `getAgents` method allows you to retrieve a list of all the agents from the CodeGPTPlus API. Here's a brief overview of how to use it:
 
+```js
+const agents = await judini.getAgents();
+```
+
 ## Parameters
 This method does not take any parameters.
 
 ## Return Value
 The `getAgents` method returns an array of objects, each representing an agent. Each object contains details about an agent, such as its ID, name, etc.
+
+# codegpt.getAgent
+
+The `getAgent` method allows you to retrieve a specific agent from the CodeGPTPlus API. Here's a brief overview of how to use it:
+
+```js
+const agent = await judini.getAgent(agentId);
+```
+
+## Parameters
+
+- **agentId**: The ID of the agent you want to retrieve from the CodeGPTPlus API.
+
+## Return Value
+
+The `getAgent` method returns an object containing details about the agent. The object contains details such as the agent's ID, name, etc.
