@@ -1,6 +1,6 @@
 {
   "name": "judini",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "judini is a Node.js library to interact with the CodeGPTPlus API. It enables sending messages to the API and handling the responses in an efficient and easy manner. It also provides methods to check the streaming status and to stop the streaming at any time.",
   "main": "index.js",
   "type": "module",

@@ -51,7 +51,7 @@ main()
 The `chatCompletion` method is a key feature of the Judini library. This function allows you to send your chat message to the CodeGPTPlus API and handle the response. Here's a brief overview of how it works:
 
 ```js
-const response = await judini.chatCompletion({ messages, agentId } , callback);
+const response = await codegpt.chatCompletion({ messages, agentId } , callback);
 ```
 
 ## Parameters
@@ -73,7 +73,7 @@ Please note that the `agentId` and `callback` parameters are optional.
 The `getAgents` method allows you to retrieve a list of all the agents from the CodeGPTPlus API. Here's a brief overview of how to use it:
 
 ```js
-const agents = await judini.getAgents();
+const agents = await codegpt.getAgents();
 ```
 
 ## Parameters
@@ -87,7 +87,7 @@ The `getAgents` method returns an array of objects, each representing an agent. 
 The `getAgent` method allows you to retrieve a specific agent from the CodeGPTPlus API. Here's a brief overview of how to use it:
 
 ```js
-const agent = await judini.getAgent(agentId);
+const agent = await codegpt.getAgent(agentId);
 ```
 
 ## Parameters
