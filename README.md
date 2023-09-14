@@ -31,6 +31,14 @@ async function main () {
         console.log(chunk) // show the streaming response
     })
     console.log({ res }) // show the final response
+
+    codegpt.getAgents().then((res) => { // get all agents
+        console.log(res)
+    })
+
+    codegpt.getAgent('YOUR_AGENT_ID').then((res) => { // get a specific agent
+        console.log(res)
+    })
 }
 
 main()
@@ -59,3 +67,13 @@ const response = await judini.chatCompletion({ messages, agentId } , callback);
 The `chatCompletion` method returns the complete string of the response from the CodeGPTPlus API. This allows you to easily access and manipulate the API response.
 
 Please note that the `agentId` and `callback` parameters are optional. 
+
+# codegpt.getAgents
+
+The `getAgents` method allows you to retrieve a list of all the agents from the CodeGPTPlus API. Here's a brief overview of how to use it:
+
+## Parameters
+This method does not take any parameters.
+
+## Return Value
+The `getAgents` method returns an array of objects, each representing an agent. Each object contains details about an agent, such as its ID, name, etc.

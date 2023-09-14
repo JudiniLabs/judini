@@ -65,4 +65,36 @@ export class CodeGPTPlus {
       }
     })
   }
+
+  async getAgents () {
+    const response = await fetch('https://plus.codegpt.co/api/v1/agent', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.apiKey
+      }
+    })
+
+    if (!response.ok) {
+      const errorMessage = `JUDINI: API Response was: ${response.status} ${response.statusText} ${JUDINI_TUTORIAL}`
+      throw new Error(errorMessage)
+    }
+
+    return await response.json()
+  }
+
+  async getAgent (agentId) {
+    const response = await fetch(`https://plus.codegpt.co/api/v1/agent/${agentId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.apiKey
+      }
+    })
+    if (!response.ok) {
+      const errorMessage = `JUDINI: API Response was: ${response.status} ${response.statusText} ${JUDINI_TUTORIAL}`
+      throw new Error(errorMessage)
+    }
+    return (await response.json())[0]
+  }
 }
