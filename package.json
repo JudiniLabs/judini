@@ -1,6 +1,6 @@
 {
   "name": "judini",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "judini is a Node.js library to interact with the CodeGPTPlus API. It enables sending messages to the API and handling the responses in an efficient and easy manner. It also provides methods to check the streaming status and to stop the streaming at any time.",
   "main": "index.js",
   "type": "module",
@@ -16,12 +16,12 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Maol-1997/judini.git"
+    "url": "git+https://github.com/JudiniLabs/judini.git"
   },
   "bugs": {
-    "url": "https://github.com/Maol-1997/judini/issues"
+    "url": "https://github.com/JudiniLabs/judini/issues"
   },
-  "homepage": "https://github.com/Maol-1997/judini#readme",
+  "homepage": "https://github.com/JudiniLabs/judini#readme",
   "devDependencies": {
     "standard": "^17.1.0"
   },
