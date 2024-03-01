@@ -260,7 +260,7 @@ import { StreamingTextResponse } from 'ai'
 import { CodeGPTPlus } from 'judini'
 
 export async function POST(req){
-    const {messages, agentId } = await req.json()
+    const { messages, agentId } = await req.json()
   
     const codegpt = new CodeGPTPlus({ apiKey: 'YOUR_API_KEY' }) // optional orgId
     const stream = await codegpt.experimental_AIStream({ messages, agentId });
