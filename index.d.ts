@@ -16,7 +16,7 @@ export interface Agent {
 }
 
   export class CodeGPTPlus {
-    constructor(config: { apiKey: string, orgId: string });
+    constructor(config: { apiKey: string, orgId?: string });
     isLoading(): boolean;
     stopStreaming(): void;
     chatCompletion(params: { messages: Array<Message>, agentId: string }, callback?: Function): Promise<string>;
