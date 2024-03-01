@@ -91,6 +91,76 @@ export class CodeGPTPlus {
   }
 
   /**
+ * Initiates a chat with the specified agent and handles the streaming of responses using a ReadableStream.
+ *
+ * @param {Object} params - The parameters for the chat.
+ * @param {Array<Object>} params.messages - An array of message objects to be sent to the agent. Each object should have a `role` (which can be 'system', 'user', or 'assistant') and `content` which is the actual message.
+ * @param {string} params.agentId - The ID of the agent to chat with.
+ * @returns {ReadableStream} A ReadableStream that emits the responses from the chat.
+ * @throws {Error} If the API response is not ok.
+ */
+  async experimental_AIStream ({ messages, agentId }) {
+    if (messages.length === 0) {
+      throw new Error('JUDINI: messages array should not be empty')
+    }
+
+    if (!agentId) {
+      throw new Error('JUDINI: agentId should not be empty')
+    }
+
+    this.isStreaming = true
+
+    const body = {
+      agentId,
+      stream: true,
+      format: 'json',
+      messages
+    }
+
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+      const errorMessage = `JUDINI: API Response was: ${response.status} ${response.statusText} ${JUDINI_TUTORIAL}`
+      throw new Error(errorMessage)
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+    const encoder = new TextEncoder()
+
+    return new ReadableStream({
+      async start (controller) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            controller.close()
+            return
+          }
+          const data = decoder.decode(value)
+          const chunks = data.split('\n\n')
+          for (const chunk of chunks) {
+            try {
+              if (!chunk) continue
+              const json = JSON.parse(chunk.trim().replace('data: ', ''))
+              const message = json?.choices?.[0]?.delta?.content
+              if (message) {
+                controller.enqueue(encoder.encode(message))
+              }
+            } catch {}
+          }
+        }
+      },
+      cancel () {
+        reader.releaseLock()
+      }
+    })
+  }
+
+  /**
    * Retrieves a list of all the agents from the CodeGPTPlus API.
    *
    * @returns {Promise<Array<{
