@@ -1,22 +1,22 @@
 const baseUrl = 'https://api-beta.codegpt.co/api/v1'
 const JUDINI_TUTORIAL = 'https://api-beta.codegpt.co/api/v1/docs'
 export class CodeGPTPlus {
-  constructor ({ apiKey, orgId }) {
+  constructor({ apiKey, orgId }) {
     this.headers = {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + apiKey,
       source: 'api',
       channel: 'sdk-js',
-      ...orgId && { 'CodeGPT-Org-Id': orgId }
+      ...(orgId && { 'CodeGPT-Org-Id': orgId })
     }
     this.isStreaming = false
   }
 
-  isLoading () {
+  isLoading() {
     return this.isStreaming
   }
 
-  stopStreaming () {
+  stopStreaming() {
     this.isStreaming = false
   }
 
@@ -29,8 +29,7 @@ export class CodeGPTPlus {
    * @returns {Promise<string>} The full response from the chat.
    * @throws {Error} If the API response is not ok.
    */
-  async chatCompletion ({ messages, agentId }, callback = () => {
-  }) {
+  async chatCompletion({ messages, agentId }, callback = () => {}) {
     if (messages.length === 0) {
       throw new Error('JUDINI: messages array should not be empty')
     }
@@ -69,37 +68,43 @@ export class CodeGPTPlus {
       while (true) {
         const { done, value } = await reader.read()
         if (done) {
-          break
-        }
-        const text = decoder.decode(value)
-        if (text.includes('data: [DONE]')) {
           this.isStreaming = false
           resolve(fullResponse)
           break
         }
-        const datas = text.split('\n\n')
-        for (let i = 0; i < datas.length; i++) {
-          try {
-            const data = JSON.parse(datas[i].replace('data: ', ''))
-            const text = data.choices[0].delta.content
-            callback(text)
-            fullResponse += text
-          } catch {}
-        }
+        const decoded = decoder.decode(value)
+        const data = JSON.parse(decoded)
+        const text = data.choices[0].delta.content
+        callback(text)
+        fullResponse += text
+        // if (text.includes('data: [DONE]')) {
+        //   this.isStreaming = false
+        //   resolve(fullResponse)
+        //   break
+        // }
+        // const datas = text.split('\n\n')
+        // for (let i = 0; i < datas.length; i++) {
+        //   try {
+        //     const data = JSON.parse(datas[i].replace('data: ', ''))
+        //     const text = data.choices[0].delta.content
+        //     callback(text)
+        //     fullResponse += text
+        //   } catch {}
+        // }
       }
     })
   }
 
   /**
- * Initiates a chat with the specified agent and handles the streaming of responses using a ReadableStream.
- *
- * @param {Object} params - The parameters for the chat.
- * @param {Array<Object>} params.messages - An array of message objects to be sent to the agent. Each object should have a `role` (which can be 'system', 'user', or 'assistant') and `content` which is the actual message.
- * @param {string} params.agentId - The ID of the agent to chat with.
- * @returns {ReadableStream} A ReadableStream that emits the responses from the chat.
- * @throws {Error} If the API response is not ok.
- */
-  async experimental_AIStream ({ messages, agentId }) {
+   * Initiates a chat with the specified agent and handles the streaming of responses using a ReadableStream.
+   *
+   * @param {Object} params - The parameters for the chat.
+   * @param {Array<Object>} params.messages - An array of message objects to be sent to the agent. Each object should have a `role` (which can be 'system', 'user', or 'assistant') and `content` which is the actual message.
+   * @param {string} params.agentId - The ID of the agent to chat with.
+   * @returns {ReadableStream} A ReadableStream that emits the responses from the chat.
+   * @throws {Error} If the API response is not ok.
+   */
+  async experimental_AIStream({ messages, agentId }) {
     if (messages.length === 0) {
       throw new Error('JUDINI: messages array should not be empty')
     }
@@ -133,7 +138,7 @@ export class CodeGPTPlus {
     const encoder = new TextEncoder()
 
     return new ReadableStream({
-      async start (controller) {
+      async start(controller) {
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
@@ -154,7 +159,7 @@ export class CodeGPTPlus {
           }
         }
       },
-      cancel () {
+      cancel() {
         reader.releaseLock()
       }
     })
@@ -178,7 +183,7 @@ export class CodeGPTPlus {
    *   date_created: string
    * }>>} An array of objects, each representing an agent.
    */
-  async getAgents () {
+  async getAgents() {
     const response = await fetch(`${baseUrl}/agent`, {
       method: 'GET',
       headers: this.headers
@@ -211,7 +216,7 @@ export class CodeGPTPlus {
    *   date_created: string
    * }>} An object containing details about the agent.
    */
-  async getAgent (agentId) {
+  async getAgent(agentId) {
     const response = await fetch(`${baseUrl}/agent/${agentId}`, {
       method: 'GET',
       headers: this.headers
@@ -235,7 +240,7 @@ export class CodeGPTPlus {
    * @returns {Promise<Object>} The created agent object.
    * @throws {Error} If the API response is not ok.
    */
-  async createAgent (agent) {
+  async createAgent(agent) {
     const response = await fetch(`${baseUrl}/agent`, {
       method: 'POST',
       headers: this.headers,
@@ -263,7 +268,7 @@ export class CodeGPTPlus {
    * @returns {Promise<Object>} The updated agent object.
    * @throws {Error} If the API response is not ok.
    */
-  async updateAgent (agentId, agent) {
+  async updateAgent(agentId, agent) {
     const response = await fetch(`${baseUrl}/agent/${agentId}`, {
       method: 'PATCH',
       headers: this.headers,
@@ -283,7 +288,7 @@ export class CodeGPTPlus {
    * @returns {Promise<string>} A message indicating the deletion was successful.
    * @throws {Error} If the API response is not ok.
    */
-  async deleteAgent (agentId) {
+  async deleteAgent(agentId) {
     const response = await fetch(`${baseUrl}/agent/${agentId}`, {
       method: 'DELETE',
       headers: this.headers
@@ -303,7 +308,7 @@ export class CodeGPTPlus {
    * @returns {Promise<Object>} The updated agent object.
    * @throws {Error} If the API response is not ok or if the agentId or documents are empty.
    */
-  async updateAgentDocuments (agentId, documents) {
+  async updateAgentDocuments(agentId, documents) {
     if (!agentId || !documents) {
       throw new Error('JUDINI: agentId and documents should not be empty')
     }
@@ -332,7 +337,7 @@ export class CodeGPTPlus {
    * @returns {Promise<Array<Object>>} An array of document objects.
    * @throws {Error} If the API response is not ok.
    */
-  async getDocuments () {
+  async getDocuments() {
     const response = await fetch(`${baseUrl}/document`, {
       method: 'GET',
       headers: this.headers
@@ -353,7 +358,7 @@ export class CodeGPTPlus {
    * @returns {Promise<Object>} The document object.
    * @throws {Error} If the API response is not ok or if the documentId is empty.
    */
-  async getDocument (documentId) {
+  async getDocument(documentId) {
     if (!documentId) {
       throw new Error('JUDINI: documentId should not be empty')
     }
@@ -378,7 +383,7 @@ export class CodeGPTPlus {
    * @returns {Promise<string>} A message indicating the deletion was successful.
    * @throws {Error} If the API response is not ok or if the documentId is empty.
    */
-  async deleteDocument (documentId) {
+  async deleteDocument(documentId) {
     if (!documentId) {
       throw new Error('JUDINI: documentId should not be empty')
     }
