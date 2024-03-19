@@ -146,17 +146,22 @@ export class CodeGPTPlus {
             return
           }
           const data = decoder.decode(value)
-          const chunks = data.split('\n\n')
-          for (const chunk of chunks) {
-            try {
-              if (!chunk) continue
-              const json = JSON.parse(chunk.trim().replace('data: ', ''))
-              const message = json?.choices?.[0]?.delta?.content
-              if (message) {
-                controller.enqueue(encoder.encode(message))
-              }
-            } catch {}
+          const json = JSON.parse(data)
+          const message = json?.choices?.[0]?.delta?.content
+          if (message) {
+            controller.enqueue(encoder.encode(message))
           }
+          // const chunks = data.split('\n\n')
+          // for (const chunk of chunks) {
+          //   try {
+          //     if (!chunk) continue
+          //     const json = JSON.parse(chunk.trim().replace('data: ', ''))
+          //     const message = json?.choices?.[0]?.delta?.content
+          //     if (message) {
+          //       controller.enqueue(encoder.encode(message))
+          //     }
+          //   } catch {}
+          // }
         }
       },
       cancel() {
